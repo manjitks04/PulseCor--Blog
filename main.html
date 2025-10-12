@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PulseCor</title>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>PulseCor</h1>
+            <p class="descrip">
+                Official documentation tracking all updates and developments for PulseCor by Manjit Somal
+            </p>
+        </div>
+
+        <div class="content" id="content"></div>
+        <div class="pagination" id="pagination"></div>
+
+        <script>
+            // array to dynamically add items, newest at the top
+            let items = [
+
+                {
+                    id: 3,
+                    title: "Phase 1 - Project Setup & Research, Week 3",
+                    description: "third entry example..."
+                },
+
+                {
+                    id: 2,
+                    title: "Phase 1 - Project Setup & Research, Week 2",
+                    description: "second entry example..."
+                },
+
+                {
+                    id: 1,
+                    title: "Phase 1 - Project Setup & Research, Week 1 (29th Sept - 5th Oct)",
+                    description: "This week, I focused on establishing the development environment for this project, including creating a GitHub repository and setting up the necessary Xcode project files. Additionally, I developed this documentation website to systematically track project progress and milestones.\n\nI also carried out extensive research into Apple HealthKit documentation to gain a comprehensive understanding of its capabilities and integration requirements for third-party applications. The Apple Developer documentation was an invaluable resource, providing clear and well-structured guidance throughout this research phase.\n\nFurthermore, I completed a thorough competitor analysis, examining existing applications within the health and wellness space to identify market gaps and opportunities. This analysis helped reinforce the significant need for PulseCor, an empathetic, non-judgmental habit-building application that addresses a clear gap in the current market landscape.\n\nKey Deliverables: Project Proposal submission, Developement Environment setup, Competitor Analysis complete"
+                }
+            ];
+
+            const itemsPerPage = 3
+            let currentPage = 1
+
+            function renderContent(page){
+                const content = document.getElementById('content');
+
+                if (items.length === 0){
+                    content.innerHTML = '<div class="empty-state">No entries yet.</div>';
+                    return;
+                }
+
+                const totalPages = Math.ceil(items.length / itemsPerPage);
+
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageItems = items.slice(start,end);
+
+                // maps each item into HTML, join combines all html pieces into one string
+                content.innerHTML = pageItems.map(item => `
+                        <div class="item">
+                            <h3>${item.title}</h3>
+                            <p>${item.description}</p>
+                        </div>
+                    `).join('');
+            }
+
+            function renderPagination() {
+                const pagination = document.getElementById('pagination');
+                
+                if (items.length === 0) {
+                    pagination.innerHTML = '';
+                    return;
+                }
+
+                const totalPages = Math.ceil(items.length / itemsPerPage);
+                let buttons = [];
+
+                // << button - takes to first page (most recent)
+               buttons.push(`
+                    <button onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''} title="First page (most recent)">
+                        &lt;&lt;
+                    </button>
+                `);
+
+                buttons.push(`
+                    <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} title="Previous page (more recent)">
+                        &lt;
+                    </button>
+                `);
+
+                if (totalPages <= 7) {
+                    for (let i = 1; i <= totalPages; i++) {
+                        buttons.push(`
+                            <button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">
+                                ${i}
+                            </button>
+                        `);
+                    }
+                } else {
+                        buttons.push(`
+                            <button onclick="goToPage(1)" class="${1 === currentPage ? 'active' : ''}">
+                                1
+                            </button>
+                        `);
+
+                    if (currentPage > 3) {
+                        buttons.push('<span class="dots">...</span>');
+                    }
+
+                    const start = Math.max(2, currentPage - 1);
+                    const end = Math.min(totalPages - 1, currentPage + 1);
+
+                    for (let i = start; i <= end; i++) {
+                        buttons.push(`
+                            <button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">
+                                ${i}
+                            </button>
+                        `);
+                    }
+
+                    if (currentPage < totalPages - 2) {
+                        buttons.push('<span class="dots">...</span>');
+                    }
+
+                    buttons.push(`
+                        <button onclick="goToPage(${totalPages})" class="${totalPages === currentPage ? 'active' : ''}">
+                            ${totalPages}
+                        </button>
+                    `);
+                }
+
+            // > button
+            buttons.push(`
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} title="Next page (older)">
+                    &gt;
+                </button>
+            `);
+
+            // >> button
+            buttons.push(`
+                <button onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last page (oldest)">
+                    &gt;&gt;
+                </button>
+            `);
+
+            pagination.innerHTML = buttons.join('');
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(items.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderContent(currentPage);
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        renderContent(currentPage);
+        renderPagination();
+
+        </script>
+    </body>
+</html>
